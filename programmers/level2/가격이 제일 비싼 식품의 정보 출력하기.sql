@@ -1,0 +1,13 @@
+-- 가격이 제일 비싼 식품의 정보 출력하기
+
+/* 서브쿼리와 MAX 사용 */
+SELECT *
+FROM FOOD_PRODUCT
+WHERE PRICE = (SELECT MAX(PRICE)
+              FROM FOOD_PRODUCT);
+
+/* ORDER BY와 LIMIT 사용 */
+SELECT *
+FROM FOOD_PRODUCT
+ORDER BY PRICE desc
+LIMIT 1;
