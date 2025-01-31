@@ -1,0 +1,18 @@
+-- 특정 기간동안 대여 가능한 자동차들의 대여비용 구하기
+
+SELECT C.CAR_ID, 
+       C.CAR_TYPE, 
+       ROUND(C.DAILY_FEE * 30 * (1 - P.DISCOUNT_RATE / 100), 0) AS FEE 
+       -- DISCOUNT_RATE가 없는 경우를 고려하려면 (1 - COALESCE(P.DISCOUNT_RATE, 0)
+FROM CAR_RENTAL_COMPANY_CAR C
+LEFT JOIN CAR_RENTAL_COMPANY_DISCOUNT_PLAN P 
+    ON C.CAR_TYPE = P.CAR_TYPE AND P.DURATION_TYPE = '30일 이상'
+WHERE C.CAR_TYPE IN ('세단', 'SUV')
+    AND C.CAR_ID NOT IN(SELECT H.CAR_ID 
+              -- NOT IN을 사용한 이유는 대여 기록이 없는 자동차도 대여 가능
+                        FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY H
+                        WHERE H.START_DATE <= '2022-11-30' 
+                          AND H.END_DATE >= '2022-11-01')
+    AND C.DAILY_FEE * 30 * (1 - P.DISCOUNT_RATE / 100) >= 500000 
+    AND C.DAILY_FEE * 30 * (1 - P.DISCOUNT_RATE / 100) < 2000000
+ORDER BY FEE DESC, CAR_TYPE ASC, CAR_ID DESC;
