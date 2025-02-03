@@ -1,0 +1,14 @@
+-- 상품을 구매한 회원 비율 구하기
+
+SELECT YEAR(SALES_DATE) AS YEAR,
+       MONTH(SALES_DATE) AS MONTH, 
+       COUNT(DISTINCT USER_ID) AS PURCHASED_USERS, -- USER_ID 중복은 하나로 간주해야 한다
+       ROUND(COUNT(DISTINCT USER_ID) / (SELECT COUNT(*)
+                                       FROM USER_INFO
+                                       WHERE YEAR(JOINED) = 2021), 1) AS PUCHASED_RATIO
+FROM ONLINE_SALE
+WHERE USER_ID IN (SELECT USER_ID
+                    FROM USER_INFO
+                    WHERE YEAR(JOINED) = 2021)
+GROUP BY YEAR(SALES_DATE), MONTH(SALES_DATE)
+ORDER BY YEAR, MONTH;
