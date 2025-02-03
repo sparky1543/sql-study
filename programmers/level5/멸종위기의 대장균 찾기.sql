@@ -1,0 +1,23 @@
+-- 멸종위기의 대장균 찾기
+
+/* 재귀 쿼리 연습하기 좋은 문제 */
+WITH RECURSIVE GENERATION AS (
+    SELECT ID, PARENT_ID, 1 AS GENERATION -- 1세대 찾기
+    FROM ECOLI_DATA 
+    WHERE PARENT_ID IS NULL
+
+    UNION ALL
+    
+    SELECT E.ID, E.PARENT_ID, G.GENERATION + 1 -- 부모 ID를 기준으로 각 개체의 부모를 찾고 재귀적으로 +1씩 증가
+    FROM ECOLI_DATA E JOIN GENERATION G ON E.PARENT_ID = G.ID
+)
+
+SELECT COUNT(ID) AS COUNT, GENERATION
+FROM GENERATION
+WHERE ID IN (SELECT ID
+             FROM ECOLI_DATA
+             WHERE ID NOT IN (SELECT PARENT_ID
+                              FROM ECOLI_DATA
+                              WHERE PARENT_ID IS NOT NULL)) -- 컬럼에 NULL이 있으면 NOT IN이 제대로 동작하지 않음
+GROUP BY GENERATION
+ORDER BY GENERATION;
