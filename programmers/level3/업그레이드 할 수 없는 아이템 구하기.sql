@@ -1,0 +1,8 @@
+-- 업그레이드 할 수 없는 아이템 구하기
+
+SELECT ITEM_ID, ITEM_NAME, RARITY
+FROM ITEM_INFO
+WHERE ITEM_ID NOT IN (SELECT PARENT_ITEM_ID
+                     FROM ITEM_TREE
+                     WHERE PARENT_ITEM_ID IS NOT NULL) -- NULL 값이 있으면 NOT IN이 제대로 안됨
+ORDER BY ITEM_ID DESC;
